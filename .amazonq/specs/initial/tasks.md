@@ -3,75 +3,75 @@
 ## Phase 1: Project Setup and Test Infrastructure
 
 ### Task 1.1: Initialize Go Module and Test Framework
-- [ ] Create `go.mod` with module name and test dependencies
-- [ ] Create basic project structure directories including test directories
-- [ ] Create `Makefile` with test, coverage, lint, and build targets
-- [ ] Set up test utilities and mocking framework
-- [ ] Configure code coverage reporting (minimum 100%)
-- [ ] Create `.golangci.yml` with strict linting configuration
-- [ ] Set up pre-commit hooks for linting and testing
+- [x] Create `go.mod` with module name and test dependencies
+- [x] Create basic project structure directories including test directories
+- [x] Create `Makefile` with test, coverage, lint, and build targets
+- [x] Set up test utilities and mocking framework
+- [x] Configure code coverage reporting (minimum 100%)
+- [x] Create `.golangci.yml` with strict linting configuration
+- [x] Set up pre-commit hooks for linting and testing
 
 ### Task 1.2: Configuration Tests (Write Tests First)
-- [ ] Create `internal/config/config_test.go` with comprehensive test cases:
-  - [ ] Test missing required environment variables
-  - [ ] Test invalid data type conversions
-  - [ ] Test boundary values (empty strings, max integers)
-  - [ ] Test malformed URLs and invalid formats
-  - [ ] Test concurrent configuration loading
-  - [ ] Test configuration validation edge cases
-- [ ] Create `internal/config/config.go` to make tests pass
-- [ ] Verify 100% test coverage for configuration package
+- [x] Create `internal/config/config_test.go` with comprehensive test cases:
+  - [x] Test missing required environment variables
+  - [x] Test invalid data type conversions
+  - [x] Test boundary values (empty strings, max integers)
+  - [x] Test malformed URLs and invalid formats
+  - [x] Test concurrent configuration loading
+  - [x] Test configuration validation edge cases
+- [x] Create `internal/config/config.go` to make tests pass
+- [x] Verify 100% test coverage for configuration package
 
 ### Task 1.3: HTTP Server Tests (Write Tests First)
-- [ ] Create `cmd/webhook/main_test.go` with server tests:
-  - [ ] Test server startup with invalid TLS certificates
-  - [ ] Test graceful shutdown with active connections
-  - [ ] Test health endpoints under load
-  - [ ] Test server behavior with no available ports
-  - [ ] Test signal handling (SIGTERM, SIGINT)
-  - [ ] Test server panic recovery
-- [ ] Create `cmd/webhook/main.go` to make tests pass
-- [ ] Verify server handles all tested failure scenarios
+- [x] Create `cmd/webhook/main_test.go` with server tests:
+  - [x] Test server startup with invalid TLS certificates
+  - [x] Test graceful shutdown with active connections
+  - [x] Test health endpoints under load
+  - [x] Test server behavior with no available ports
+  - [x] Test signal handling (SIGTERM, SIGINT)
+  - [x] Test server panic recovery
+- [x] Create `cmd/webhook/main.go` to make tests pass
+- [x] Verify server handles all tested failure scenarios
 
 ## Phase 2: Webhook Framework Tests (Test-First)
 
 ### Task 2.1: TLS and HTTP Server Tests (Write Tests First)
-- [ ] Create `internal/webhook/server_test.go` with exhaustive tests:
-  - [ ] Test TLS certificate loading from various sources
-  - [ ] Test expired/invalid certificate handling
-  - [ ] Test certificate rotation during runtime
-  - [ ] Test HTTP timeout scenarios (read, write, idle)
-  - [ ] Test middleware chain execution order
-  - [ ] Test server shutdown with pending requests
-  - [ ] Test concurrent connection handling
-  - [ ] Test memory leaks with long-running connections
-- [ ] Create `internal/webhook/server.go` to make tests pass
+- [x] Create `internal/webhook/server_test.go` with exhaustive tests:
+  - [x] Test TLS certificate loading from various sources
+  - [x] Test expired/invalid certificate handling
+  - [x] Test certificate rotation during runtime
+  - [x] Test HTTP timeout scenarios (read, write, idle)
+  - [x] Test middleware chain execution order
+  - [x] Test server shutdown with pending requests
+  - [x] Test concurrent connection handling
+  - [x] Test memory leaks with long-running connections
+- [x] Create `internal/webhook/server.go` to make tests pass
 
 ### Task 2.2: Admission Handler Tests (Write Tests First)
-- [ ] Create `internal/webhook/handler_test.go` with comprehensive tests:
-  - [ ] Test malformed AdmissionReview JSON
-  - [ ] Test missing required fields in admission request
-  - [ ] Test invalid Kubernetes API versions
-  - [ ] Test oversized request payloads
-  - [ ] Test concurrent request processing
-  - [ ] Test request timeout handling
-  - [ ] Test admission response serialization errors
-  - [ ] Test webhook failure policy enforcement
-  - [ ] Test request tracing and correlation IDs
-- [ ] Create `internal/webhook/handler.go` to make tests pass
+- [x] Create `internal/webhook/handler_test.go` with comprehensive tests:
+  - [x] Test malformed AdmissionReview JSON
+  - [x] Test missing required fields in admission request
+  - [x] Test invalid Kubernetes API versions
+  - [x] Test oversized request payloads
+  - [x] Test concurrent request processing
+  - [x] Test request timeout handling
+  - [x] Test admission response serialization errors
+  - [x] Test webhook failure policy enforcement
+  - [x] Test request tracing and correlation IDs
+- [x] Create `internal/webhook/handler.go` to make tests pass
 
 ### Task 2.3: Pod Mutation Tests (Write Tests First)
-- [ ] Create `internal/webhook/mutator_test.go` with edge case tests:
-  - [ ] Test pods with no containers
-  - [ ] Test pods with init containers only
-  - [ ] Test pods with existing architecture selectors
-  - [ ] Test pods with conflicting node selectors
-  - [ ] Test pods with invalid image references
-  - [ ] Test pods with empty image names
-  - [ ] Test mutation of system pods (kube-system)
-  - [ ] Test concurrent mutation requests
-  - [ ] Test mutation rollback scenarios
-- [ ] Create `internal/webhook/mutator.go` to make tests pass
+- [x] Create `internal/webhook/mutator_test.go` with edge case tests:
+  - [x] Test pods with no containers
+  - [x] Test pods with init containers only
+  - [x] Test pods with existing architecture selectors
+  - [x] Test pods with conflicting node selectors
+  - [x] Test pods with invalid image references
+  - [x] Test pods with empty image names
+  - [x] Test mutation of system pods (kube-system)
+  - [x] Test concurrent mutation requests
+  - [x] Test mutation rollback scenarios
+- [x] Create `internal/webhook/mutator.go` to make tests pass
 
 ## Phase 3: Architecture Detection
 
