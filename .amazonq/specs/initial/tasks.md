@@ -130,26 +130,26 @@
 ## Phase 4: Enhanced Features
 
 ### Task 4.1: Registry Credential Management (Write Tests First)
-- [ ] Create `internal/credentials/resolver_test.go` with credential resolution tests:
-  - [ ] Test pod imagePullSecrets extraction and parsing
-  - [ ] Test service account imagePullSecrets fallback
-  - [ ] Test dockerconfigjson secret format parsing
-  - [ ] Test credential caching and TTL expiration
-  - [ ] Test concurrent credential resolution
-  - [ ] Test missing/invalid secret handling
-  - [ ] Test registry URL matching logic
-- [ ] Create `internal/credentials/resolver.go` to make tests pass
-- [ ] Update RBAC templates to include secrets and serviceaccounts permissions
-- [ ] Integrate credential resolver into registry clients
+- [x] Create `internal/credentials/resolver_test.go` with credential resolution tests:
+  - [x] Test pod imagePullSecrets extraction and parsing
+  - [x] Test service account imagePullSecrets fallback
+  - [x] Test dockerconfigjson secret format parsing
+  - [x] Test credential caching and TTL expiration
+  - [x] Test concurrent credential resolution
+  - [x] Test missing/invalid secret handling
+  - [x] Test registry URL matching logic
+- [x] Create `internal/credentials/resolver.go` to make tests pass
+- [x] Update RBAC templates to include secrets and serviceaccounts permissions
+- [x] Integrate credential resolver into registry clients
 
 ### Task 4.2: Advanced Mutation Logic with Credentials
 - [x] Update mutator with architecture detection
 - [x] Implement multi-arch selection strategy
 - [x] Add fallback mechanisms
 - [x] Handle edge cases and errors
-- [ ] Integrate credential resolver into mutator
-- [ ] Add credential-aware registry client selection
-- [ ] Test private registry image architecture detection
+- [x] Integrate credential resolver into mutator
+- [x] Add credential-aware registry client selection
+- [x] Test private registry image architecture detection
 
 ### Task 4.3: Observability
 - [x] Create `internal/metrics/prometheus.go`

@@ -11,6 +11,9 @@ import (
 	"time"
 
 	"github.com/lsdopen/archy/internal/config"
+	"github.com/lsdopen/archy/internal/webhook"
+	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
 )
 
 func main() {
@@ -19,9 +22,24 @@ func main() {
 		log.Fatalf("Failed to load configuration: %v", err)
 	}
 
+	// Create Kubernetes client
+	config, err := rest.InClusterConfig()
+	if err != nil {
+		log.Fatalf("Failed to create Kubernetes config: %v", err)
+	}
+
+	kubeClient, err := kubernetes.NewForConfig(config)
+	if err != nil {
+		log.Fatalf("Failed to create Kubernetes client: %v", err)
+	}
+
+	// Create webhook handler
+	handler := webhook.NewAdmissionHandler(kubeClient)
+
 	mux := http.NewServeMux()
 	mux.HandleFunc("/health", healthHandler)
 	mux.HandleFunc("/ready", readyHandler)
+	mux.Handle("/mutate", handler)
 
 	server := &http.Server{
 		Addr:         fmt.Sprintf(":%d", cfg.Port),

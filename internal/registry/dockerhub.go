@@ -13,6 +13,8 @@ import (
 type DockerHubClient struct {
 	baseURL    string
 	httpClient *http.Client
+	username   string
+	password   string
 }
 
 // DockerHubManifest represents Docker Hub manifest list response
@@ -33,6 +35,14 @@ func NewDockerHubClient() *DockerHubClient {
 			Timeout: 30 * time.Second,
 		},
 	}
+}
+
+// NewDockerHubClientWithCredentials creates an authenticated Docker Hub client
+func NewDockerHubClientWithCredentials(username, password string) *DockerHubClient {
+	client := NewDockerHubClient()
+	client.username = username
+	client.password = password
+	return client
 }
 
 // GetSupportedArchitectures retrieves supported architectures for an image

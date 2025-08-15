@@ -17,10 +17,12 @@ import (
 	admissionv1 "k8s.io/api/admission/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/client-go/kubernetes/fake"
 )
 
 func TestHandler_MalformedAdmissionReview(t *testing.T) {
-	handler := NewAdmissionHandler()
+	client := fake.NewSimpleClientset()
+	handler := NewAdmissionHandler(client)
 
 	tests := []struct {
 		name    string
@@ -59,7 +61,8 @@ func TestHandler_MalformedAdmissionReview(t *testing.T) {
 }
 
 func TestHandler_MissingRequiredFields(t *testing.T) {
-	handler := NewAdmissionHandler()
+	client := fake.NewSimpleClientset()
+	handler := NewAdmissionHandler(client)
 
 	tests := []struct {
 		name    string
@@ -107,7 +110,8 @@ func TestHandler_MissingRequiredFields(t *testing.T) {
 }
 
 func TestHandler_InvalidKubernetesAPIVersions(t *testing.T) {
-	handler := NewAdmissionHandler()
+	client := fake.NewSimpleClientset()
+	handler := NewAdmissionHandler(client)
 
 	tests := []struct {
 		name       string
@@ -154,7 +158,8 @@ func TestHandler_InvalidKubernetesAPIVersions(t *testing.T) {
 }
 
 func TestHandler_OversizedPayload(t *testing.T) {
-	handler := NewAdmissionHandler()
+	client := fake.NewSimpleClientset()
+	handler := NewAdmissionHandler(client)
 
 	// Create a large payload (> 1MB)
 	largeData := make([]byte, 2*1024*1024) // 2MB
@@ -172,7 +177,8 @@ func TestHandler_OversizedPayload(t *testing.T) {
 }
 
 func TestHandler_ConcurrentRequests(t *testing.T) {
-	handler := NewAdmissionHandler()
+	client := fake.NewSimpleClientset()
+	handler := NewAdmissionHandler(client)
 
 	review := &admissionv1.AdmissionReview{
 		TypeMeta: metav1.TypeMeta{
@@ -234,7 +240,8 @@ func TestHandler_ConcurrentRequests(t *testing.T) {
 }
 
 func TestHandler_RequestTimeout(t *testing.T) {
-	handler := NewAdmissionHandler()
+	client := fake.NewSimpleClientset()
+	handler := NewAdmissionHandler(client)
 
 	review := &admissionv1.AdmissionReview{
 		TypeMeta: metav1.TypeMeta{
@@ -268,7 +275,8 @@ func TestHandler_RequestTimeout(t *testing.T) {
 }
 
 func TestHandler_AdmissionResponseSerialization(t *testing.T) {
-	handler := NewAdmissionHandler()
+	client := fake.NewSimpleClientset()
+	handler := NewAdmissionHandler(client)
 
 	review := &admissionv1.AdmissionReview{
 		TypeMeta: metav1.TypeMeta{
@@ -305,7 +313,8 @@ func TestHandler_AdmissionResponseSerialization(t *testing.T) {
 }
 
 func TestHandler_WebhookFailurePolicy(t *testing.T) {
-	handler := NewAdmissionHandler()
+	client := fake.NewSimpleClientset()
+	handler := NewAdmissionHandler(client)
 
 	// Test that webhook fails open (allows requests even on internal errors)
 	review := &admissionv1.AdmissionReview{

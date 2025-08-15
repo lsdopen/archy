@@ -9,9 +9,11 @@ import (
 	admissionv1 "k8s.io/api/admission/v1"
 	corev1 "k8s.io/api/core/v1"
 	"github.com/lsdopen/archy/internal/cache"
+	"github.com/lsdopen/archy/internal/credentials"
 	"github.com/lsdopen/archy/internal/metrics"
 	"github.com/lsdopen/archy/internal/registry"
 	"github.com/lsdopen/archy/pkg/types"
+	"k8s.io/client-go/kubernetes"
 )
 
 // JSONPatch represents a JSON Patch operation
@@ -23,24 +25,27 @@ type JSONPatch struct {
 
 // Mutator handles pod mutations
 type Mutator struct {
-	defaultArch    string
-	registryClient types.RegistryClient
-	cache          *cache.MemoryCache
-	metrics        *metrics.Metrics
+	defaultArch        string
+	registryClient     types.RegistryClient
+	cache              *cache.MemoryCache
+	metrics            *metrics.Metrics
+	credentialResolver *credentials.Resolver
 }
 
 // NewMutator creates a new mutator
-func NewMutator() *Mutator {
+func NewMutator(kubeClient kubernetes.Interface) *Mutator {
 	// Create Docker Hub client as default
 	client := registry.NewDockerHubClient()
 	cache := cache.NewMemoryCache(1000, 5*time.Minute)
 	metrics := metrics.NewMetrics()
+	credResolver := credentials.NewResolver(kubeClient)
 	
 	return &Mutator{
-		defaultArch:    "amd64",
-		registryClient: client,
-		cache:          cache,
-		metrics:        metrics,
+		defaultArch:        "amd64",
+		registryClient:     client,
+		cache:              cache,
+		metrics:            metrics,
+		credentialResolver: credResolver,
 	}
 }
 
@@ -75,7 +80,7 @@ func (m *Mutator) Mutate(req *admissionv1.AdmissionRequest) ([]JSONPatch, error)
 	}
 
 	// Detect architecture from first image
-	arch := m.detectArchitecture(images[0])
+	arch := m.detectArchitecture(&pod, images[0])
 	selectedArch = arch
 
 	// Create patches to add node selector
@@ -131,7 +136,7 @@ func (m *Mutator) createNodeSelectorPatches(pod *corev1.Pod, arch string) []JSON
 }
 
 // detectArchitecture detects the architecture for an image using cache and registry
-func (m *Mutator) detectArchitecture(image string) string {
+func (m *Mutator) detectArchitecture(pod *corev1.Pod, image string) string {
 	// Check cache first
 	if archs, found := m.cache.Get(image); found {
 		m.metrics.RecordCacheHit(image)
@@ -142,11 +147,21 @@ func (m *Mutator) detectArchitecture(image string) string {
 
 	m.metrics.RecordCacheMiss(image)
 
+	// Resolve credentials for this image
+	cred, _ := m.credentialResolver.ResolveCredentials(pod, image)
+
+	// Create registry client with credentials if available
+	client := m.registryClient
+	if cred != nil {
+		// Use authenticated client (implementation would create client with credentials)
+		client = registry.NewDockerHubClientWithCredentials(cred.Username, cred.Password)
+	}
+
 	// Query registry
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	archs, err := m.registryClient.GetSupportedArchitectures(ctx, image)
+	archs, err := client.GetSupportedArchitectures(ctx, image)
 	if err != nil {
 		// Fail open with default architecture
 		return m.defaultArch

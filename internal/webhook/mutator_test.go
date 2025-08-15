@@ -11,10 +11,12 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/client-go/kubernetes/fake"
 )
 
 func TestMutator_PodsWithNoContainers(t *testing.T) {
-	mutator := NewMutator()
+	client := fake.NewSimpleClientset()
+	mutator := NewMutator(client)
 
 	pod := &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
@@ -41,7 +43,8 @@ func TestMutator_PodsWithNoContainers(t *testing.T) {
 }
 
 func TestMutator_PodsWithInitContainersOnly(t *testing.T) {
-	mutator := NewMutator()
+	client := fake.NewSimpleClientset()
+	mutator := NewMutator(client)
 
 	pod := &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
@@ -77,7 +80,8 @@ func TestMutator_PodsWithInitContainersOnly(t *testing.T) {
 }
 
 func TestMutator_PodsWithExistingArchitectureSelector(t *testing.T) {
-	mutator := NewMutator()
+	client := fake.NewSimpleClientset()
+	mutator := NewMutator(client)
 
 	pod := &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
@@ -112,7 +116,8 @@ func TestMutator_PodsWithExistingArchitectureSelector(t *testing.T) {
 }
 
 func TestMutator_PodsWithConflictingNodeSelectors(t *testing.T) {
-	mutator := NewMutator()
+	client := fake.NewSimpleClientset()
+	mutator := NewMutator(client)
 
 	pod := &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
@@ -151,7 +156,8 @@ func TestMutator_PodsWithConflictingNodeSelectors(t *testing.T) {
 }
 
 func TestMutator_PodsWithInvalidImageReferences(t *testing.T) {
-	mutator := NewMutator()
+	client := fake.NewSimpleClientset()
+	mutator := NewMutator(client)
 
 	tests := []struct {
 		name  string
@@ -208,7 +214,8 @@ func TestMutator_PodsWithInvalidImageReferences(t *testing.T) {
 }
 
 func TestMutator_SystemPods(t *testing.T) {
-	mutator := NewMutator()
+	client := fake.NewSimpleClientset()
+	mutator := NewMutator(client)
 
 	pod := &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
@@ -245,7 +252,8 @@ func TestMutator_SystemPods(t *testing.T) {
 }
 
 func TestMutator_ConcurrentMutationRequests(t *testing.T) {
-	mutator := NewMutator()
+	client := fake.NewSimpleClientset()
+	mutator := NewMutator(client)
 
 	pod := &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
@@ -303,7 +311,8 @@ func TestMutator_ConcurrentMutationRequests(t *testing.T) {
 }
 
 func TestMutator_MutationRollback(t *testing.T) {
-	mutator := NewMutator()
+	client := fake.NewSimpleClientset()
+	mutator := NewMutator(client)
 
 	// Test that mutations are atomic - either all succeed or none are applied
 	pod := &corev1.Pod{
