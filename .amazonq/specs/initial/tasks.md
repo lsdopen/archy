@@ -129,17 +129,27 @@
 
 ## Phase 4: Enhanced Features
 
-### Task 4.1: Extended Registry Support
-- [ ] Create `internal/registry/ecr.go` for ECR support
-- [ ] Add private registry authentication
-- [ ] Implement registry credential management
-- [ ] Add registry selection logic
+### Task 4.1: Registry Credential Management (Write Tests First)
+- [ ] Create `internal/credentials/resolver_test.go` with credential resolution tests:
+  - [ ] Test pod imagePullSecrets extraction and parsing
+  - [ ] Test service account imagePullSecrets fallback
+  - [ ] Test dockerconfigjson secret format parsing
+  - [ ] Test credential caching and TTL expiration
+  - [ ] Test concurrent credential resolution
+  - [ ] Test missing/invalid secret handling
+  - [ ] Test registry URL matching logic
+- [ ] Create `internal/credentials/resolver.go` to make tests pass
+- [ ] Update RBAC templates to include secrets and serviceaccounts permissions
+- [ ] Integrate credential resolver into registry clients
 
-### Task 4.2: Advanced Mutation Logic
-- [ ] Update mutator with architecture detection
-- [ ] Implement multi-arch selection strategy
-- [ ] Add fallback mechanisms
-- [ ] Handle edge cases and errors
+### Task 4.2: Advanced Mutation Logic with Credentials
+- [x] Update mutator with architecture detection
+- [x] Implement multi-arch selection strategy
+- [x] Add fallback mechanisms
+- [x] Handle edge cases and errors
+- [ ] Integrate credential resolver into mutator
+- [ ] Add credential-aware registry client selection
+- [ ] Test private registry image architecture detection
 
 ### Task 4.3: Observability
 - [x] Create `internal/metrics/prometheus.go`
