@@ -92,8 +92,42 @@ archy/
 ### Registry Client Architecture
 ```go
 type RegistryClient interface {
-    GetSupportedArchitectures(image string) ([]string, error)
+    GetSupportedArchitectures(ctx context.Context, image string) ([]string, error)
 }
+
+type CredentialResolver interface {
+    ResolveCredentials(pod *corev1.Pod, imageRef string) (*RegistryCredential, error)
+}
+```
+
+### Registry Credential Management Strategy
+**Hybrid Priority Chain Approach**: Automatic credential discovery with fail-safe fallback
+
+**Priority Order**:
+1. **Pod imagePullSecrets**: Extract from `spec.imagePullSecrets[]` in admission request
+2. **Service Account imagePullSecrets**: Use pod's service account default credentials
+3. **Optional webhook credentials**: Configurable fallback credentials (advanced use cases)
+4. **Anonymous access**: Graceful degradation for public registries
+
+**Implementation Benefits**:
+- Zero additional configuration for most use cases
+- Leverages existing Kubernetes credential mechanisms
+- Respects namespace-based credential isolation
+- Automatic per-pod credential discovery
+- Fail-open behavior maintains availability
+
+**RBAC Requirements**:
+```yaml
+rules:
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: [""]
+  resources: ["secrets"]
+  verbs: ["get"]
+- apiGroups: [""]
+  resources: ["serviceaccounts"]
+  verbs: ["get"]
 ```
 
 ### Caching Strategy

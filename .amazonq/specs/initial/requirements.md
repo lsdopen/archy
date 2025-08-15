@@ -24,7 +24,8 @@ A Kubernetes mutating webhook that automatically adds node selectors to pods bas
 - **Override Prevention**: Skip mutation if pod already has architecture selector
 
 ### 4. Configuration
-- **Registry Credentials**: Support for private registry authentication
+- **Registry Credentials**: Support for private registry authentication via pod imagePullSecrets
+- **Credential Resolution**: Automatic discovery from pod and service account imagePullSecrets
 - **Default Architecture**: Configurable fallback architecture
 - **Webhook Settings**: TLS certificates, port, namespace filtering
 - **Logging Level**: Configurable verbosity
