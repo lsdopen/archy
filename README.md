@@ -6,6 +6,29 @@ A Kubernetes mutating webhook that automatically adds node selectors based on co
 
 Archy analyzes container images in pod specifications and adds appropriate `kubernetes.io/arch` node selectors to ensure pods are scheduled on compatible nodes.
 
+## Installation
+
+### Using Helm (Recommended)
+
+```bash
+helm install archy oci://ghcr.io/lsdopen/charts/archy
+```
+
+### Configuration
+
+Configure via Helm values:
+
+```yaml
+config:
+  defaultArch: amd64
+  logLevel: info
+  cacheTimeout: 300s
+
+tls:
+  certManager: true
+  issuer: selfsigned-issuer
+```
+
 ## Development
 
 ### Prerequisites
@@ -13,6 +36,7 @@ Archy analyzes container images in pod specifications and adds appropriate `kube
 - Go 1.21+
 - golangci-lint
 - make
+- Helm 3.12+
 
 ### Setup
 
@@ -41,6 +65,16 @@ make lint
 make build
 ```
 
+### Helm Chart Development
+
+```bash
+# Lint chart
+helm lint chart/
+
+# Test installation
+helm install archy-test chart/ --dry-run
+```
+
 ## Configuration
 
 Configure via environment variables:
@@ -58,3 +92,4 @@ Configure via environment variables:
 2. All linting rules must pass
 3. Use conventional commits for semantic versioning
 4. Write tests before implementation (TDD)
+5. Use Helm chart for deployment (no raw manifests)

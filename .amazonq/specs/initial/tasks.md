@@ -151,11 +151,10 @@
 
 ## Phase 5: Kubernetes Deployment
 
-### Task 5.1: Raw Kubernetes Manifests
-- [x] Create `deploy/deployment.yaml`
-- [x] Create `deploy/service.yaml`
-- [x] Create `deploy/rbac.yaml`
-- [x] Create `deploy/webhook.yaml` (MutatingWebhookConfiguration)
+### Task 5.1: Helm Chart Only Deployment
+- [x] Removed raw Kubernetes manifests (deploy folder)
+- [x] Use Helm chart as single deployment method
+- [x] Ensure no raw manifests exist to prevent confusion
 
 ### Task 5.2: Helm Chart
 - [x] Create `chart/Chart.yaml` with metadata

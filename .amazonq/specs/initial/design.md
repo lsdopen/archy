@@ -37,10 +37,6 @@ archy/
 │       ├── secret.yaml          # TLS certificate template
 │       ├── webhook.yaml         # MutatingWebhookConfiguration
 │       └── _helpers.tpl         # Template helpers
-├── deploy/
-│   ├── webhook.yaml             # Raw Kubernetes manifests
-│   ├── rbac.yaml                # RBAC configuration
-│   └── service.yaml             # Service definition
 ├── .github/
 │   └── workflows/
 │       ├── build.yaml           # Build and test workflow
@@ -57,7 +53,7 @@ archy/
 1. **HTTP Server**: TLS-enabled server with health endpoints
 2. **Admission Handler**: Basic webhook request/response handling
 3. **Configuration**: Environment-based configuration loading
-4. **Deployment**: Basic Kubernetes manifests
+4. **Deployment**: Helm chart templates only
 
 ### Phase 2: Architecture Detection
 1. **Registry Interface**: Pluggable registry client design
