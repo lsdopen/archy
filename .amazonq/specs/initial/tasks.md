@@ -152,21 +152,20 @@
 ## Phase 5: Kubernetes Deployment
 
 ### Task 5.1: Raw Kubernetes Manifests
-- [ ] Create `deploy/deployment.yaml`
-- [ ] Create `deploy/service.yaml`
-- [ ] Create `deploy/rbac.yaml`
-- [ ] Create `deploy/webhook.yaml` (MutatingWebhookConfiguration)
+- [x] Create `deploy/deployment.yaml`
+- [x] Create `deploy/service.yaml`
+- [x] Create `deploy/rbac.yaml`
+- [x] Create `deploy/webhook.yaml` (MutatingWebhookConfiguration)
 
 ### Task 5.2: Helm Chart
-- [ ] Create `chart/Chart.yaml` with metadata
-- [ ] Create `chart/values.yaml` with defaults
-- [ ] Create `chart/templates/deployment.yaml`
-- [ ] Create `chart/templates/service.yaml`
-- [ ] Create `chart/templates/rbac.yaml`
-- [ ] Create `chart/templates/configmap.yaml`
-- [ ] Create `chart/templates/secret.yaml`
-- [ ] Create `chart/templates/webhook.yaml`
-- [ ] Create `chart/templates/_helpers.tpl`
+- [x] Create `chart/Chart.yaml` with metadata
+- [x] Create `chart/values.yaml` with defaults
+- [x] Create `chart/templates/deployment.yaml`
+- [x] Create `chart/templates/service.yaml`
+- [x] Create `chart/templates/rbac.yaml`
+- [x] Create `chart/templates/secret.yaml` (cert-manager integration)
+- [x] Create `chart/templates/webhook.yaml`
+- [x] Create `chart/templates/_helpers.tpl`
 
 ## Phase 6: Build and CI/CD
 
