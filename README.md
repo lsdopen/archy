@@ -27,6 +27,12 @@ config:
 tls:
   certManager: true
   issuer: selfsigned-issuer
+
+monitoring:
+  serviceMonitor:
+    enabled: true
+  prometheusRule:
+    enabled: true
 ```
 
 ## Development

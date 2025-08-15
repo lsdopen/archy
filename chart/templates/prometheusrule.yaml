@@ -1,0 +1,81 @@
+{{- if .Values.monitoring.prometheusRule.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ include "archy.fullname" . }}
+  labels:
+    {{- include "archy.labels" . | nindent 4 }}
+    {{- with .Values.monitoring.prometheusRule.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  groups:
+  - name: archy.rules
+    rules:
+    - alert: ArchyWebhookDown
+      expr: up{job="{{ include "archy.fullname" . }}"} == 0
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Archy webhook is down"
+        description: "Archy webhook has been down for more than 5 minutes"
+    
+    - alert: ArchyHighErrorRate
+      expr: |
+        (
+          rate(archy_mutations_total{success="false"}[5m]) /
+          rate(archy_mutations_total[5m])
+        ) > 0.1
+      for: 2m
+      labels:
+        severity: warning
+      annotations:
+        summary: "High error rate in Archy mutations"
+        description: "Archy mutation error rate is {{ $value | humanizePercentage }} over the last 5 minutes"
+    
+    - alert: ArchySlowMutations
+      expr: |
+        histogram_quantile(0.95, rate(archy_mutation_duration_seconds_bucket[5m])) > 1
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Slow Archy mutations"
+        description: "95th percentile of Archy mutation duration is {{ $value }}s over the last 5 minutes"
+    
+    - alert: ArchyLowCacheHitRate
+      expr: |
+        (
+          rate(archy_cache_hits_total[5m]) /
+          (rate(archy_cache_hits_total[5m]) + rate(archy_cache_misses_total[5m]))
+        ) < 0.5
+      for: 10m
+      labels:
+        severity: info
+      annotations:
+        summary: "Low cache hit rate in Archy"
+        description: "Archy cache hit rate is {{ $value | humanizePercentage }} over the last 5 minutes"
+    
+    - alert: ArchyHighMemoryUsage
+      expr: |
+        container_memory_usage_bytes{pod=~"{{ include "archy.fullname" . }}-.*"} /
+        container_spec_memory_limit_bytes{pod=~"{{ include "archy.fullname" . }}-.*"} > 0.8
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "High memory usage in Archy"
+        description: "Archy pod {{ $labels.pod }} memory usage is {{ $value | humanizePercentage }} of limit"
+    
+    - alert: ArchyHighCPUUsage
+      expr: |
+        rate(container_cpu_usage_seconds_total{pod=~"{{ include "archy.fullname" . }}-.*"}[5m]) /
+        container_spec_cpu_quota{pod=~"{{ include "archy.fullname" . }}-.*"} * 100000 > 80
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "High CPU usage in Archy"
+        description: "Archy pod {{ $labels.pod }} CPU usage is {{ $value }}% of limit"
+{{- end }}
