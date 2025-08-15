@@ -1,6 +1,7 @@
 package credentials
 
 import (
+	"context"
 	"encoding/base64"
 	"encoding/json"
 	"testing"
@@ -39,7 +40,7 @@ func TestResolver_PodImagePullSecretsExtraction(t *testing.T) {
 			corev1.DockerConfigJsonKey: configJSON,
 		},
 	}
-	client.CoreV1().Secrets("default").Create(nil, secret, metav1.CreateOptions{})
+	client.CoreV1().Secrets("default").Create(context.TODO(), secret, metav1.CreateOptions{})
 
 	pod := &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
@@ -74,7 +75,7 @@ func TestResolver_ServiceAccountImagePullSecretsFallback(t *testing.T) {
 			{Name: "sa-secret"},
 		},
 	}
-	client.CoreV1().ServiceAccounts("default").Create(nil, sa, metav1.CreateOptions{})
+	client.CoreV1().ServiceAccounts("default").Create(context.TODO(), sa, metav1.CreateOptions{})
 
 	// Create secret
 	dockerConfig := map[string]interface{}{
@@ -97,7 +98,7 @@ func TestResolver_ServiceAccountImagePullSecretsFallback(t *testing.T) {
 			corev1.DockerConfigJsonKey: configJSON,
 		},
 	}
-	client.CoreV1().Secrets("default").Create(nil, secret, metav1.CreateOptions{})
+	client.CoreV1().Secrets("default").Create(context.TODO(), secret, metav1.CreateOptions{})
 
 	pod := &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
@@ -229,7 +230,7 @@ func TestResolver_CredentialCaching(t *testing.T) {
 			corev1.DockerConfigJsonKey: configJSON,
 		},
 	}
-	client.CoreV1().Secrets("default").Create(nil, secret, metav1.CreateOptions{})
+	client.CoreV1().Secrets("default").Create(context.TODO(), secret, metav1.CreateOptions{})
 
 	pod := &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
@@ -281,7 +282,7 @@ func TestResolver_TTLExpiration(t *testing.T) {
 			corev1.DockerConfigJsonKey: configJSON,
 		},
 	}
-	client.CoreV1().Secrets("default").Create(nil, secret, metav1.CreateOptions{})
+	client.CoreV1().Secrets("default").Create(context.TODO(), secret, metav1.CreateOptions{})
 
 	pod := &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
