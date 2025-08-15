@@ -1,0 +1,252 @@
+# Archy - Test-Driven Implementation Tasks
+
+## Phase 1: Project Setup and Test Infrastructure
+
+### Task 1.1: Initialize Go Module and Test Framework
+- [ ] Create `go.mod` with module name and test dependencies
+- [ ] Create basic project structure directories including test directories
+- [ ] Create `Makefile` with test, coverage, lint, and build targets
+- [ ] Set up test utilities and mocking framework
+- [ ] Configure code coverage reporting (minimum 100%)
+- [ ] Create `.golangci.yml` with strict linting configuration
+- [ ] Set up pre-commit hooks for linting and testing
+
+### Task 1.2: Configuration Tests (Write Tests First)
+- [ ] Create `internal/config/config_test.go` with comprehensive test cases:
+  - [ ] Test missing required environment variables
+  - [ ] Test invalid data type conversions
+  - [ ] Test boundary values (empty strings, max integers)
+  - [ ] Test malformed URLs and invalid formats
+  - [ ] Test concurrent configuration loading
+  - [ ] Test configuration validation edge cases
+- [ ] Create `internal/config/config.go` to make tests pass
+- [ ] Verify 100% test coverage for configuration package
+
+### Task 1.3: HTTP Server Tests (Write Tests First)
+- [ ] Create `cmd/webhook/main_test.go` with server tests:
+  - [ ] Test server startup with invalid TLS certificates
+  - [ ] Test graceful shutdown with active connections
+  - [ ] Test health endpoints under load
+  - [ ] Test server behavior with no available ports
+  - [ ] Test signal handling (SIGTERM, SIGINT)
+  - [ ] Test server panic recovery
+- [ ] Create `cmd/webhook/main.go` to make tests pass
+- [ ] Verify server handles all tested failure scenarios
+
+## Phase 2: Webhook Framework Tests (Test-First)
+
+### Task 2.1: TLS and HTTP Server Tests (Write Tests First)
+- [ ] Create `internal/webhook/server_test.go` with exhaustive tests:
+  - [ ] Test TLS certificate loading from various sources
+  - [ ] Test expired/invalid certificate handling
+  - [ ] Test certificate rotation during runtime
+  - [ ] Test HTTP timeout scenarios (read, write, idle)
+  - [ ] Test middleware chain execution order
+  - [ ] Test server shutdown with pending requests
+  - [ ] Test concurrent connection handling
+  - [ ] Test memory leaks with long-running connections
+- [ ] Create `internal/webhook/server.go` to make tests pass
+
+### Task 2.2: Admission Handler Tests (Write Tests First)
+- [ ] Create `internal/webhook/handler_test.go` with comprehensive tests:
+  - [ ] Test malformed AdmissionReview JSON
+  - [ ] Test missing required fields in admission request
+  - [ ] Test invalid Kubernetes API versions
+  - [ ] Test oversized request payloads
+  - [ ] Test concurrent request processing
+  - [ ] Test request timeout handling
+  - [ ] Test admission response serialization errors
+  - [ ] Test webhook failure policy enforcement
+  - [ ] Test request tracing and correlation IDs
+- [ ] Create `internal/webhook/handler.go` to make tests pass
+
+### Task 2.3: Pod Mutation Tests (Write Tests First)
+- [ ] Create `internal/webhook/mutator_test.go` with edge case tests:
+  - [ ] Test pods with no containers
+  - [ ] Test pods with init containers only
+  - [ ] Test pods with existing architecture selectors
+  - [ ] Test pods with conflicting node selectors
+  - [ ] Test pods with invalid image references
+  - [ ] Test pods with empty image names
+  - [ ] Test mutation of system pods (kube-system)
+  - [ ] Test concurrent mutation requests
+  - [ ] Test mutation rollback scenarios
+- [ ] Create `internal/webhook/mutator.go` to make tests pass
+
+## Phase 3: Architecture Detection
+
+### Task 3.1: Registry Client Interface
+- [ ] Create `pkg/types/types.go` with shared interfaces
+- [ ] Define `RegistryClient` interface
+- [ ] Create `internal/registry/client.go` with client factory
+
+### Task 3.2: Docker Hub Client
+- [ ] Create `internal/registry/dockerhub.go`
+- [ ] Implement manifest API calls
+- [ ] Parse multi-arch manifest lists
+- [ ] Handle authentication for private repos
+
+### Task 3.3: Manifest Parsing
+- [ ] Create `internal/registry/manifest.go`
+- [ ] Parse Docker manifest v2 schema
+- [ ] Extract architecture information
+- [ ] Handle single-arch and multi-arch images
+
+### Task 3.4: Caching Layer
+- [ ] Create `internal/cache/memory.go`
+- [ ] Implement in-memory cache with TTL
+- [ ] Add LRU eviction policy
+- [ ] Thread-safe cache operations
+
+## Phase 4: Enhanced Features
+
+### Task 4.1: Extended Registry Support
+- [ ] Create `internal/registry/ecr.go` for ECR support
+- [ ] Add private registry authentication
+- [ ] Implement registry credential management
+- [ ] Add registry selection logic
+
+### Task 4.2: Advanced Mutation Logic
+- [ ] Update mutator with architecture detection
+- [ ] Implement multi-arch selection strategy
+- [ ] Add fallback mechanisms
+- [ ] Handle edge cases and errors
+
+### Task 4.3: Observability
+- [ ] Create `internal/metrics/prometheus.go`
+- [ ] Add mutation counters and timing metrics
+- [ ] Implement structured logging
+- [ ] Add request tracing
+
+## Phase 5: Kubernetes Deployment
+
+### Task 5.1: Raw Kubernetes Manifests
+- [ ] Create `deploy/deployment.yaml`
+- [ ] Create `deploy/service.yaml`
+- [ ] Create `deploy/rbac.yaml`
+- [ ] Create `deploy/webhook.yaml` (MutatingWebhookConfiguration)
+
+### Task 5.2: Helm Chart
+- [ ] Create `chart/Chart.yaml` with metadata
+- [ ] Create `chart/values.yaml` with defaults
+- [ ] Create `chart/templates/deployment.yaml`
+- [ ] Create `chart/templates/service.yaml`
+- [ ] Create `chart/templates/rbac.yaml`
+- [ ] Create `chart/templates/configmap.yaml`
+- [ ] Create `chart/templates/secret.yaml`
+- [ ] Create `chart/templates/webhook.yaml`
+- [ ] Create `chart/templates/_helpers.tpl`
+
+## Phase 6: Build and CI/CD
+
+### Task 6.1: Linting Configuration (Write Tests First)
+- [ ] Create `.golangci.yml` with comprehensive linter configuration:
+  - [ ] Enable all security linters (gosec, gas)
+  - [ ] Enable performance linters (ineffassign, prealloc)
+  - [ ] Enable style linters (gofmt, goimports, misspell)
+  - [ ] Enable complexity linters (gocyclo, gocognit)
+  - [ ] Configure custom rules for 12-factor compliance
+- [ ] Create linting tests to verify configuration works
+- [ ] Add Makefile targets for linting
+
+### Task 6.2: Container Build Tests (Write Tests First)
+- [ ] Create container security tests:
+  - [ ] Test container for known vulnerabilities
+  - [ ] Test container runs as non-root user
+  - [ ] Test container has no shell access
+  - [ ] Test container filesystem is read-only
+  - [ ] Test container resource limits enforcement
+- [ ] Create multi-arch build tests:
+  - [ ] Test binary compatibility across architectures
+  - [ ] Test container startup on different platforms
+- [ ] Create `Containerfile` to pass security tests
+
+### Task 6.3: GitHub Actions - PR Workflow
+- [ ] Create `.github/workflows/pr.yaml` with comprehensive checks:
+  - [ ] Run golangci-lint with zero tolerance
+  - [ ] Execute full test suite with coverage reporting
+  - [ ] Perform security scanning with gosec
+  - [ ] Validate Helm chart templates
+  - [ ] Check conventional commit format
+  - [ ] Block merge if any check fails
+
+### Task 6.4: GitHub Actions - Main Branch Workflow
+- [ ] Create `.github/workflows/main.yaml` for releases:
+  - [ ] Run complete test suite including chaos tests
+  - [ ] Build and test multi-arch container images
+  - [ ] Use semantic-release for automatic versioning
+  - [ ] Generate changelog from conventional commits
+  - [ ] Publish container images to GHCR
+  - [ ] Publish Helm chart to OCI registry
+  - [ ] Create GitHub release with assets
+
+### Task 6.5: Branch Protection and Semantic Release
+- [ ] Configure GitHub branch protection rules:
+  - [ ] Require PR reviews and status checks
+  - [ ] Dismiss stale reviews on new commits
+  - [ ] Restrict direct pushes to main branch
+- [ ] Set up semantic-release configuration:
+  - [ ] Configure conventional commit parsing
+  - [ ] Set up automatic version bumping
+  - [ ] Configure changelog generation
+  - [ ] Set up asset publishing
+
+## Phase 7: Testing
+
+### Task 7.1: Unit Tests
+- [ ] Add tests for `internal/config/`
+- [ ] Add tests for `internal/registry/`
+- [ ] Add tests for `internal/cache/`
+- [ ] Add tests for `internal/webhook/mutator.go`
+
+### Task 7.2: Integration Tests
+- [ ] Create webhook server integration tests
+- [ ] Add registry client integration tests
+- [ ] Test end-to-end mutation flow
+- [ ] Add performance benchmarks
+
+### Task 7.3: Failure Scenario Tests
+- [ ] Test registry timeout scenarios
+- [ ] Test invalid manifest responses
+- [ ] Test network failure handling
+- [ ] Test malformed admission requests
+
+### Task 7.4: Security Tests
+- [ ] Test TLS certificate validation
+- [ ] Test RBAC permissions
+- [ ] Test input validation
+- [ ] Test credential handling
+
+## Phase 8: Documentation
+
+### Task 8.1: Code Documentation
+- [ ] Add Go doc comments to all public functions
+- [ ] Create package-level documentation
+- [ ] Add usage examples
+
+### Task 8.2: Deployment Documentation
+- [ ] Create installation guide
+- [ ] Document Helm chart values
+- [ ] Add troubleshooting guide
+- [ ] Create configuration reference
+
+### Task 8.3: Final System Validation
+- [ ] Run complete end-to-end test suite
+- [ ] Verify 100% code coverage across all packages
+- [ ] Validate all linting rules pass with zero warnings
+- [ ] Confirm all security scans pass
+- [ ] Validate all security requirements are tested
+- [ ] Confirm all failure scenarios are covered
+- [ ] Execute full chaos engineering test suite
+- [ ] Validate performance meets all SLA requirements
+- [ ] Test semantic release workflow
+- [ ] Validate branch protection rules work correctly
+
+### Task 8.4: Development Documentation
+- [ ] Update README.md with comprehensive testing and linting approach
+- [ ] Add contributing guidelines emphasizing test-first development
+- [ ] Document build process including linting and test execution
+- [ ] Add development setup guide with linting requirements
+- [ ] Create code review checklist focusing on test quality and linting
+- [ ] Document conventional commit format requirements
+- [ ] Add semantic release workflow documentation
