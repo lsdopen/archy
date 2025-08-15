@@ -4,7 +4,6 @@ import (
 	"crypto/tls"
 	"fmt"
 	"net/http"
-	"runtime"
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
