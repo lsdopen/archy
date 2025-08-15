@@ -1,11 +1,17 @@
 package webhook
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
+	"time"
 
 	admissionv1 "k8s.io/api/admission/v1"
 	corev1 "k8s.io/api/core/v1"
+	"github.com/lsdopen/archy/internal/cache"
+	"github.com/lsdopen/archy/internal/metrics"
+	"github.com/lsdopen/archy/internal/registry"
+	"github.com/lsdopen/archy/pkg/types"
 )
 
 // JSONPatch represents a JSON Patch operation
@@ -17,18 +23,38 @@ type JSONPatch struct {
 
 // Mutator handles pod mutations
 type Mutator struct {
-	defaultArch string
+	defaultArch    string
+	registryClient types.RegistryClient
+	cache          *cache.MemoryCache
+	metrics        *metrics.Metrics
 }
 
 // NewMutator creates a new mutator
 func NewMutator() *Mutator {
+	// Create Docker Hub client as default
+	client := registry.NewDockerHubClient()
+	cache := cache.NewMemoryCache(1000, 5*time.Minute)
+	metrics := metrics.NewMetrics()
+	
 	return &Mutator{
-		defaultArch: "amd64",
+		defaultArch:    "amd64",
+		registryClient: client,
+		cache:          cache,
+		metrics:        metrics,
 	}
 }
 
 // Mutate processes an admission request and returns JSON patches
 func (m *Mutator) Mutate(req *admissionv1.AdmissionRequest) ([]JSONPatch, error) {
+	start := time.Now()
+	var success bool
+	var selectedArch string
+	defer func() {
+		if selectedArch != "" {
+			m.metrics.RecordMutation("pod", selectedArch, success, time.Since(start))
+		}
+	}()
+
 	var pod corev1.Pod
 	if err := json.Unmarshal(req.Object.Raw, &pod); err != nil {
 		// Return empty patches on unmarshal error (fail open)
@@ -48,11 +74,13 @@ func (m *Mutator) Mutate(req *admissionv1.AdmissionRequest) ([]JSONPatch, error)
 		return []JSONPatch{}, nil // No containers to process
 	}
 
-	// For now, use default architecture (Phase 3 will add registry detection)
-	arch := m.defaultArch
+	// Detect architecture from first image
+	arch := m.detectArchitecture(images[0])
+	selectedArch = arch
 
 	// Create patches to add node selector
 	patches := m.createNodeSelectorPatches(&pod, arch)
+	success = len(patches) > 0
 
 	return patches, nil
 }
@@ -100,4 +128,37 @@ func (m *Mutator) createNodeSelectorPatches(pod *corev1.Pod, arch string) []JSON
 	}
 
 	return patches
+}
+
+// detectArchitecture detects the architecture for an image using cache and registry
+func (m *Mutator) detectArchitecture(image string) string {
+	// Check cache first
+	if archs, found := m.cache.Get(image); found {
+		m.metrics.RecordCacheHit(image)
+		if len(archs) > 0 {
+			return archs[0] // Return first supported architecture
+		}
+	}
+
+	m.metrics.RecordCacheMiss(image)
+
+	// Query registry
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	archs, err := m.registryClient.GetSupportedArchitectures(ctx, image)
+	if err != nil {
+		// Fail open with default architecture
+		return m.defaultArch
+	}
+
+	if len(archs) == 0 {
+		return m.defaultArch
+	}
+
+	// Cache the result
+	m.cache.Set(image, archs)
+
+	// Return first supported architecture
+	return archs[0]
 }

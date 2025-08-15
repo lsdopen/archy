@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"runtime"
 	"time"
+
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 // NewServer creates a new HTTPS server with TLS configuration
@@ -25,6 +27,7 @@ func NewServer(addr, certPath, keyPath string) (*http.Server, error) {
 	mux.HandleFunc("/health", healthHandler)
 	mux.HandleFunc("/ready", readyHandler)
 	mux.HandleFunc("/slow", slowHandler)
+	mux.Handle("/metrics", promhttp.Handler())
 
 	server := &http.Server{
 		Addr:         addr,

@@ -142,10 +142,12 @@
 - [ ] Handle edge cases and errors
 
 ### Task 4.3: Observability
-- [ ] Create `internal/metrics/prometheus.go`
-- [ ] Add mutation counters and timing metrics
-- [ ] Implement structured logging
-- [ ] Add request tracing
+- [x] Create `internal/metrics/prometheus.go`
+- [x] Add mutation counters and timing metrics
+- [x] Implement structured logging
+- [x] Add request tracing
+- [x] Integrate metrics into mutator and webhook server
+- [x] Add architecture detection with cache integration
 
 ## Phase 5: Kubernetes Deployment
 
