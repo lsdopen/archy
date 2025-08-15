@@ -33,9 +33,10 @@ archy/
 │       ├── deployment.yaml      # Webhook deployment template
 │       ├── service.yaml         # Service template
 │       ├── rbac.yaml            # RBAC templates
-│       ├── configmap.yaml       # Configuration template
 │       ├── secret.yaml          # TLS certificate template
 │       ├── webhook.yaml         # MutatingWebhookConfiguration
+│       ├── servicemonitor.yaml  # Prometheus ServiceMonitor
+│       ├── prometheusrule.yaml  # Prometheus alerting rules
 │       └── _helpers.tpl         # Template helpers
 ├── .github/
 │   └── workflows/
@@ -150,9 +151,10 @@ type RegistryClient interface {
 - **Deployment**: Webhook pod with configurable resources
 - **Service**: ClusterIP service for webhook endpoint
 - **RBAC**: ServiceAccount, ClusterRole, ClusterRoleBinding
-- **ConfigMap**: Environment-based configuration
 - **Secret**: TLS certificates (cert-manager integration)
 - **MutatingWebhookConfiguration**: Admission webhook registration
+- **ServiceMonitor**: Prometheus metrics scraping (optional)
+- **PrometheusRule**: Alerting rules for key metrics (optional)
 
 ### Configurable Values
 ```yaml
@@ -179,6 +181,12 @@ config:
 tls:
   certManager: true
   issuer: selfsigned-issuer
+
+monitoring:
+  serviceMonitor:
+    enabled: false
+  prometheusRule:
+    enabled: false
 ```
 
 ### GitHub Actions Integration

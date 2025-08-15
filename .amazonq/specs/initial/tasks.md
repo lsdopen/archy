@@ -164,6 +164,8 @@
 - [x] Create `chart/templates/rbac.yaml`
 - [x] Create `chart/templates/secret.yaml` (cert-manager integration)
 - [x] Create `chart/templates/webhook.yaml`
+- [x] Create `chart/templates/servicemonitor.yaml` (Prometheus monitoring)
+- [x] Create `chart/templates/prometheusrule.yaml` (alerting rules)
 - [x] Create `chart/templates/_helpers.tpl`
 
 ## Phase 6: Build and CI/CD
