@@ -73,30 +73,59 @@
   - [x] Test mutation rollback scenarios
 - [x] Create `internal/webhook/mutator.go` to make tests pass
 
-## Phase 3: Architecture Detection
+## Phase 3: Architecture Detection Tests (Test-First)
 
-### Task 3.1: Registry Client Interface
-- [ ] Create `pkg/types/types.go` with shared interfaces
-- [ ] Define `RegistryClient` interface
-- [ ] Create `internal/registry/client.go` with client factory
+### Task 3.1: Registry Client Interface Tests (Write Tests First)
+- [x] Create `pkg/types/types_test.go` with interface compliance tests:
+  - [x] Test interface method signatures
+  - [x] Test error handling contracts
+  - [x] Test timeout behavior requirements
+  - [x] Test concurrent access patterns
+- [x] Create `internal/registry/client_test.go` with factory tests:
+  - [x] Test client factory with invalid registry URLs
+  - [x] Test client factory with unsupported registry types
+  - [x] Test client factory with network failures
+  - [x] Test client factory with authentication failures
+- [x] Create interfaces and factory to make tests pass
 
-### Task 3.2: Docker Hub Client
-- [ ] Create `internal/registry/dockerhub.go`
-- [ ] Implement manifest API calls
-- [ ] Parse multi-arch manifest lists
-- [ ] Handle authentication for private repos
+### Task 3.2: Docker Hub Client Tests (Write Tests First)
+- [x] Create `internal/registry/dockerhub_test.go` with failure tests:
+  - [x] Test API rate limiting responses (429)
+  - [x] Test network timeouts and retries
+  - [x] Test malformed JSON responses
+  - [x] Test authentication token expiry
+  - [x] Test private repository access denied
+  - [x] Test non-existent image handling
+  - [x] Test registry API version changes
+  - [x] Test concurrent API calls
+  - [x] Test memory usage with large manifests
+- [x] Create `internal/registry/dockerhub.go` to make tests pass
 
-### Task 3.3: Manifest Parsing
-- [ ] Create `internal/registry/manifest.go`
-- [ ] Parse Docker manifest v2 schema
-- [ ] Extract architecture information
-- [ ] Handle single-arch and multi-arch images
+### Task 3.3: Manifest Parsing Tests (Write Tests First)
+- [x] Create `internal/registry/manifest_test.go` with parsing tests:
+  - [x] Test invalid JSON manifest structures
+  - [x] Test missing required manifest fields
+  - [x] Test unsupported manifest schema versions
+  - [x] Test manifest with no architecture information
+  - [x] Test manifest with unknown architectures
+  - [x] Test manifest list with mixed schema versions
+  - [x] Test extremely large manifest files
+  - [x] Test manifest with circular references
+  - [x] Test concurrent manifest parsing
+- [x] Create `internal/registry/manifest.go` to make tests pass
 
-### Task 3.4: Caching Layer
-- [ ] Create `internal/cache/memory.go`
-- [ ] Implement in-memory cache with TTL
-- [ ] Add LRU eviction policy
-- [ ] Thread-safe cache operations
+### Task 3.4: Cache Tests (Write Tests First)
+- [x] Create `internal/cache/memory_test.go` with stress tests:
+  - [x] Test cache under memory pressure
+  - [x] Test concurrent read/write operations (race conditions)
+  - [x] Test TTL expiration edge cases
+  - [x] Test LRU eviction with rapid insertions
+  - [x] Test cache behavior during garbage collection
+  - [x] Test cache statistics accuracy
+  - [x] Test cache with zero/negative TTL values
+  - [x] Test cache key collision scenarios
+  - [x] Test cache persistence across restarts
+- [x] Create `internal/cache/memory.go` to make tests pass
 
 ## Phase 4: Enhanced Features
 
