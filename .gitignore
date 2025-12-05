@@ -25,3 +25,7 @@ go.work
 
 # Local certificates
 certs/
+
+# Build output
+bin/
+webhook
