@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: archy-webhook
+  labels:
+    app: archy-webhook
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: archy-webhook
+  template:
+    metadata:
+      labels:
+        app: archy-webhook
+    spec:
+      containers:
+        - name: webhook
+          image: archy-webhook
+          imagePullPolicy: Always
+          args:
+            - "--tls-cert=/etc/webhook/certs/tls.crt"
+            - "--tls-key=/etc/webhook/certs/tls.key"
+            - "--port=8443"
+          ports:
+            - containerPort: 8443
+          volumeMounts:
+            - name: webhook-certs
+              mountPath: /etc/webhook/certs
+              readOnly: true
+      volumes:
+        - name: webhook-certs
+          secret:
+            secretName: archy-webhook-certs
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: archy-webhook
+  labels:
+    app: archy-webhook
+spec:
+  ports:
+    - port: 443
+      targetPort: 8443
+  selector:
+    app: archy-webhook

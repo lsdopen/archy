@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"fmt"
+	"flag"
 	"log"
 	"net/http"
 	"os"
@@ -10,86 +10,69 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/lsdopen/archy/internal/config"
-	"github.com/lsdopen/archy/internal/webhook"
+	"github.com/lsdopen/archy/pkg/inspector"
+	"github.com/lsdopen/archy/pkg/webhook"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 )
 
 func main() {
-	cfg, err := config.Load()
-	if err != nil {
-		log.Fatalf("Failed to load configuration: %v", err)
-	}
+	var (
+		port     string
+		certFile string
+		keyFile  string
+	)
 
-	// Create Kubernetes client
+	flag.StringVar(&port, "port", "8443", "Port to listen on")
+	flag.StringVar(&certFile, "tls-cert", "/etc/webhook/certs/tls.crt", "Path to TLS certificate")
+	flag.StringVar(&keyFile, "tls-key", "/etc/webhook/certs/tls.key", "Path to TLS key")
+	flag.Parse()
+
+	// Create in-cluster Kubernetes client for accessing secrets
 	config, err := rest.InClusterConfig()
 	if err != nil {
-		log.Fatalf("Failed to create Kubernetes config: %v", err)
+		log.Fatalf("Failed to create in-cluster config: %v", err)
 	}
 
-	kubeClient, err := kubernetes.NewForConfig(config)
+	k8sClient, err := kubernetes.NewForConfig(config)
 	if err != nil {
 		log.Fatalf("Failed to create Kubernetes client: %v", err)
 	}
 
-	// Create webhook handler
-	handler := webhook.NewAdmissionHandler(kubeClient)
+	inspector := inspector.NewRegistryInspector()
+	handler := webhook.NewHandler(inspector, k8sClient)
 
 	mux := http.NewServeMux()
-	mux.HandleFunc("/health", healthHandler)
-	mux.HandleFunc("/ready", readyHandler)
 	mux.Handle("/mutate", handler)
+	mux.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("ok"))
+	})
 
 	server := &http.Server{
-		Addr:         fmt.Sprintf(":%d", cfg.Port),
-		Handler:      recoveryMiddleware(mux),
-		ReadTimeout:  30 * time.Second,
-		WriteTimeout: 30 * time.Second,
-		IdleTimeout:  120 * time.Second,
+		Addr:    ":" + port,
+		Handler: mux,
 	}
 
-	go handleSignals(server)
+	go func() {
+		log.Printf("Starting server on port %s...", port)
+		if err := server.ListenAndServeTLS(certFile, keyFile); err != nil && err != http.ErrServerClosed {
+			log.Fatalf("Could not listen on %s: %v", port, err)
+		}
+	}()
 
-	log.Printf("Starting webhook server on port %d", cfg.Port)
-	if err := server.ListenAndServeTLS(cfg.TLSCertPath, cfg.TLSKeyPath); err != http.ErrServerClosed {
-		log.Fatalf("Server failed: %v", err)
-	}
-}
+	// Graceful shutdown
+	stop := make(chan os.Signal, 1)
+	signal.Notify(stop, os.Interrupt, syscall.SIGTERM)
+	<-stop
 
-func healthHandler(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("OK"))
-}
-
-func readyHandler(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Ready"))
-}
-
-func recoveryMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		defer func() {
-			if err := recover(); err != nil {
-				log.Printf("Panic recovered: %v", err)
-				w.WriteHeader(http.StatusInternalServerError)
-			}
-		}()
-		next.ServeHTTP(w, r)
-	})
-}
-
-var handleSignals = func(server *http.Server) {
-	sigChan := make(chan os.Signal, 1)
-	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
-
-	<-sigChan
-	log.Println("Shutdown signal received")
-
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	log.Println("Shutting down server...")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
 	if err := server.Shutdown(ctx); err != nil {
-		log.Printf("Server shutdown error: %v", err)
+		log.Fatalf("Server forced to shutdown: %v", err)
 	}
+
+	log.Println("Server exiting")
 }

@@ -1,19 +1,16 @@
-.PHONY: test lint build coverage clean
+.PHONY: build build-amd64 build-arm64 clean
 
-test:
-	go test -v -race ./...
-
-test-coverage:
-	go test -v -race -coverprofile=coverage.out ./...
-	go tool cover -html=coverage.out -o coverage.html
-
-lint:
-	golangci-lint run
+BINARY_NAME=webhook
+BUILD_DIR=bin
 
 build:
-	CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o bin/webhook ./cmd/webhook
+	go build -o $(BUILD_DIR)/$(BINARY_NAME) ./cmd/webhook
+
+build-amd64:
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o $(BUILD_DIR)/$(BINARY_NAME)-amd64 ./cmd/webhook
+
+build-arm64:
+	CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -o $(BUILD_DIR)/$(BINARY_NAME)-arm64 ./cmd/webhook
 
 clean:
-	rm -rf bin/ coverage.out coverage.html
-
-all: lint test build
+	rm -rf $(BUILD_DIR)
