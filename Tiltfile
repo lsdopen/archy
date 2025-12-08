@@ -16,7 +16,7 @@ k8s_yaml(secret_yaml_tls(
 docker_build_with_restart(
     'archy-webhook',
     '.',
-    dockerfile='Dockerfile.dev',
+    dockerfile='Containerfile.dev',
     # Live update for fast iteration
     live_update=[
         sync('.', '/app'),
