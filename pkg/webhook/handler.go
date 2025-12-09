@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 
 	"github.com/google/go-containerregistry/pkg/v1/remote"
@@ -23,8 +24,12 @@ var (
 )
 
 func init() {
-	admissionv1.AddToScheme(scheme)
-	corev1.AddToScheme(scheme)
+	if err := admissionv1.AddToScheme(scheme); err != nil {
+		panic(err)
+	}
+	if err := corev1.AddToScheme(scheme); err != nil {
+		panic(err)
+	}
 }
 
 type Handler struct {
@@ -84,7 +89,9 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	w.Write(respBytes)
+	if _, err := w.Write(respBytes); err != nil {
+		log.Printf("Failed to write response: %v", err)
+	}
 }
 
 func (h *Handler) mutate(ctx context.Context, ar *admissionv1.AdmissionReview) *admissionv1.AdmissionResponse {
