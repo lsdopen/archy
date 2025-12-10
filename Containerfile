@@ -1,10 +1,14 @@
-FROM golang:1.25-alpine AS builder
+FROM --platform=$BUILDPLATFORM golang:1.25-alpine AS builder
+ARG TARGETPLATFORM
+ARG BUILDPLATFORM
+ARG TARGETOS
+ARG TARGETARCH
 WORKDIR /app
 COPY go.mod go.sum ./
 RUN go mod download
 COPY . .
-# CGO_ENABLED=0 for static binary
-RUN CGO_ENABLED=0 go build -o webhook ./cmd/webhook
+# CGO_ENABLED=0 for static binary, build for target architecture
+RUN CGO_ENABLED=0 GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -o webhook ./cmd/webhook
 
 FROM scratch
 WORKDIR /app
