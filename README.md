@@ -38,6 +38,33 @@ When a Pod is submitted to the cluster:
 - **Network Connectivity**: The webhook must have network access to the container registries to inspect images.
 - **Explicit Secrets**: For private registries, `imagePullSecrets` must be explicitly defined in the Pod spec or attached to the ServiceAccount.
 
+## Installation
+
+### Using Helm (Recommended)
+
+Install from GitHub Container Registry:
+
+```bash
+# Install the latest version
+helm install archy oci://ghcr.io/lsdopen/archy/charts/archy
+
+# Install a specific version
+helm install archy oci://ghcr.io/lsdopen/archy/charts/archy --version 0.1.0
+
+# Install with custom values
+helm install archy oci://ghcr.io/lsdopen/archy/charts/archy --values my-values.yaml
+```
+
+### Manual Deployment
+
+Apply the Kubernetes manifests directly:
+
+```bash
+kubectl apply -f deploy/
+```
+
+For detailed configuration options and advanced deployment scenarios, see the [Helm Chart README](chart/README.md).
+
 ## License
 
 Apache License 2.0
