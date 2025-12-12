@@ -1,0 +1,21 @@
+1. The Archy webhook is now installed and will automatically:
+   - Inspect container image manifests to determine supported architectures
+   - Add kubernetes.io/arch nodeSelector to Pods when a single common architecture is found
+   - Allow scheduler flexibility when multiple architectures are supported
+   - Reject Pods when no common architecture exists (fail-safe behavior)
+
+2. Check the webhook status:
+   kubectl get mutatingwebhookconfiguration {{ include "archy.fullname" . }}
+   kubectl get pods -n {{ .Release.Namespace }} -l "{{ include "archy.selectorLabels" . }}"
+
+3. View webhook logs:
+   kubectl logs -n {{ .Release.Namespace }} -l "{{ include "archy.selectorLabels" . }}" -f
+
+4. Test webhook connectivity:
+   kubectl port-forward -n {{ .Release.Namespace }} svc/{{ include "archy.fullname" . }} 8443:443
+   curl -k https://localhost:8443/healthz
+
+5. The webhook will process all new Pod creations except:
+   - Pods in kube-system and kube-public namespaces
+   - Pods with the label app.kubernetes.io/name={{ include "archy.name" . }}
+   - Pods that already have a nodeSelector defined

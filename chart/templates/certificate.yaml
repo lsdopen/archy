@@ -1,0 +1,37 @@
+{{- include "archy.validateValues" . -}}
+{{- if eq .Values.certificates.method "cert-manager" }}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ include "archy.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "archy.labels" . | nindent 4 }}
+  {{- with .Values.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  secretName: {{ include "archy.certificateSecretName" . }}
+  {{- with .Values.certificates.certManager.duration }}
+  duration: {{ . }}
+  {{- end }}
+  {{- with .Values.certificates.certManager.renewBefore }}
+  renewBefore: {{ . }}
+  {{- end }}
+  subject:
+    organizationUnits:
+      - {{ .Release.Namespace }}
+  commonName: {{ include "archy.serviceName" . }}.{{ .Release.Namespace }}.svc.cluster.local
+  dnsNames:
+    - {{ include "archy.serviceName" . }}
+    - {{ include "archy.serviceName" . }}.{{ .Release.Namespace }}
+    - {{ include "archy.serviceName" . }}.{{ .Release.Namespace }}.svc
+    - {{ include "archy.serviceName" . }}.{{ .Release.Namespace }}.svc.cluster.local
+  issuerRef:
+    name: {{ .Values.certificates.certManager.issuer.name }}
+    kind: {{ .Values.certificates.certManager.issuer.kind }}
+    {{- if eq .Values.certificates.certManager.issuer.kind "Issuer" }}
+    group: cert-manager.io
+    {{- end }}
+{{- end }}

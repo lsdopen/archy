@@ -1,0 +1,17 @@
+apiVersion: v2
+name: archy
+description: A Kubernetes mutating admission webhook that automatically ensures Pods are scheduled on nodes with compatible architectures
+type: application
+version: 0.1.0
+appVersion: "latest"
+keywords:
+  - kubernetes
+  - admission-webhook
+  - multi-architecture
+  - scheduling
+home: https://github.com/lsdopen/archy
+sources:
+  - https://github.com/lsdopen/archy
+maintainers:
+  - name: Seagyn Davis
+    email: seagyn@lsdopen.io
